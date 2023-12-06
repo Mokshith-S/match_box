@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class HomeAnimation extends StatefulWidget {
@@ -10,8 +12,7 @@ class HomeAnimation extends StatefulWidget {
 class _HomeAnimationState extends State<HomeAnimation>
     with TickerProviderStateMixin {
   late AnimationController _firstStar;
-  late AnimationController _secondStar;
-  late AnimationController _thirdStar;
+  late Timer _timer;
 
   @override
   void initState() {
@@ -19,37 +20,17 @@ class _HomeAnimationState extends State<HomeAnimation>
     _firstStar = AnimationController(
       animationBehavior: AnimationBehavior.normal,
       vsync: this,
-      duration: const Duration(seconds: 3),
-      reverseDuration: const Duration(seconds: 3),
-    );
-    _secondStar = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-    _thirdStar = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
+      reverseDuration: const Duration(seconds: 1),
     );
     _firstStar.forward();
+    _timer = Timer.periodic(const Duration(seconds: 6), (timer) {
+      _firstStar.forward();
+    });
 
     _firstStar.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _secondStar.forward();
+      if (AnimationStatus.completed == status) {
         _firstStar.reverse();
-      }
-    });
-
-    _secondStar.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _thirdStar.forward();
-        _secondStar.reverse();
-      }
-    });
-
-    _thirdStar.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _firstStar.forward();
-        _thirdStar.reverse();
       }
     });
   }
@@ -57,63 +38,171 @@ class _HomeAnimationState extends State<HomeAnimation>
   @override
   void dispose() {
     _firstStar.dispose();
-    _secondStar.dispose();
-    _thirdStar.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: SizedBox(
-        height: double.infinity,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            AlignTransition(
-              alignment: Tween(
-                begin: Alignment.bottomCenter,
-                end: Alignment.center,
-              ).animate(
-                CurvedAnimation(parent: _firstStar, curve: Curves.easeInOut),
+      child: Container(
+          padding: const EdgeInsets.all(20),
+          height: double.infinity,
+          width: double.infinity,
+          child: Stack(
+            children: [
+              const Positioned(
+                top: 45,
+                right: 80,
+                child: Icon(
+                  Icons.dark_mode_sharp,
+                  size: 55,
+                  color: Colors.white,
+                ),
               ),
-              child: const Icon(
-                Icons.star,
-                size: 35,
-                color: Colors.blueGrey,
+              Positioned(
+                bottom: 20,
+                child: FadeTransition(
+                  opacity: Tween(begin: 0.0, end: 1.0).animate(
+                    CurvedAnimation(parent: _firstStar, curve: Curves.linear),
+                  ),
+                  child: const Icon(
+                    Icons.star,
+                    size: 25,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-            AlignTransition(
-              alignment: Tween(
-                begin: Alignment.bottomCenter,
-                end: Alignment.center,
-              ).animate(
-                CurvedAnimation(parent: _secondStar, curve: Curves.easeInOut),
+              Positioned(
+                left: 40,
+                top: 150,
+                child: FadeTransition(
+                  opacity: Tween(begin: 0.0, end: 1.0).animate(
+                    CurvedAnimation(parent: _firstStar, curve: Curves.linear),
+                  ),
+                  child: const Icon(
+                    Icons.star,
+                    size: 36,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              child: const Icon(
-                Icons.flag,
-                size: 35,
-                color: Colors.lightGreen,
+              Positioned(
+                right: 40,
+                bottom: 100,
+                child: FadeTransition(
+                  opacity: Tween(begin: 0.0, end: 1.0).animate(
+                    CurvedAnimation(parent: _firstStar, curve: Curves.linear),
+                  ),
+                  child: const Icon(
+                    Icons.star,
+                    size: 30,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-            AlignTransition(
-              alignment: Tween(
-                begin: Alignment.bottomCenter,
-                end: Alignment.center,
-              ).animate(
-                CurvedAnimation(parent: _thirdStar, curve: Curves.easeInOut),
+              Positioned(
+                bottom: 30,
+                left: 180,
+                child: FadeTransition(
+                  opacity: Tween(begin: 0.0, end: 1.0).animate(
+                    CurvedAnimation(parent: _firstStar, curve: Curves.linear),
+                  ),
+                  child: const Icon(
+                    Icons.star,
+                    size: 37,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              child: const Icon(
-                Icons.ac_unit,
-                size: 35,
-                color: Colors.grey,
+              Positioned(
+                top: 170,
+                right: 150,
+                child: FadeTransition(
+                  opacity: Tween(begin: 0.0, end: 1.0).animate(
+                    CurvedAnimation(parent: _firstStar, curve: Curves.linear),
+                  ),
+                  child: const Icon(
+                    Icons.star,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+              const Positioned(
+                top: 200,
+                right: 220,
+                child: Icon(
+                  Icons.star,
+                  size: 33,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                top: 280,
+                right: 250,
+                child: Icon(
+                  Icons.star,
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                top: 250,
+                right: 100,
+                child: Icon(
+                  Icons.star,
+                  size: 21,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                bottom: 70,
+                left: 95,
+                child: Icon(
+                  Icons.star,
+                  size: 21,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                top: 80,
+                left: 35,
+                child: Icon(
+                  Icons.star,
+                  size: 26,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                top: 105,
+                right: 10,
+                child: Icon(
+                  Icons.star,
+                  size: 28,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                top: 255,
+                left: 10,
+                child: Icon(
+                  Icons.star,
+                  size: 28,
+                  color: Colors.white,
+                ),
+              ),
+              const Positioned(
+                bottom: 20,
+                right: 26,
+                child: Icon(
+                  Icons.star,
+                  size: 22,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          )),
     );
   }
 }
