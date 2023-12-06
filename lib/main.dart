@@ -54,9 +54,9 @@ class MatchBoxEntryPage extends ConsumerWidget {
             colors: [
               Colors.white,
               Color.fromARGB(255, 109, 109, 109),
-              Color.fromARGB(255, 59, 59, 59),
+              Color.fromARGB(255, 54, 54, 54),
             ],
-            stops: [0.0, 0.6, 0.8],
+            stops: [0.0, 0.4, 0.6],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

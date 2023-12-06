@@ -20,9 +20,10 @@ class IconStatusNotifier extends StateNotifier<Map<String, bool>> {
       firstId = id;
     } else if (firstId != id && firstIcon == icon) {
       state = {...state, icon.toString(): true};
-      firstIcon = null;
+      firstIcon = icon;
     } else {
-      firstIcon = null;
+      firstIcon = icon;
+      firstId = id;
     }
   }
 
