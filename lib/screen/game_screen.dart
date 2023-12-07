@@ -19,23 +19,47 @@ class MatchScreen extends ConsumerStatefulWidget {
 }
 
 class _MatchScreenState extends ConsumerState<MatchScreen> {
-  bool startTimer = false;
+  bool globalTimerStart = false;
   final List<List<IconData>> iconBox = calculate();
   Duration currentTime = const Duration(hours: 0, minutes: 0, seconds: 0);
   Timer? measureTime;
+  late AnimationController _globalController;
+  late bool matched;
 
-  void changeInteractionState() {
-    setState(() {
-      startTimer = true;
-    });
-    clock.start();
-    measureTime = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          currentTime = clock.elapsed;
-        });
+  bool changeInteractionState() {
+    if (!globalTimerStart) {
+      clock.start();
+      measureTime = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (mounted) {
+          setState(() {
+            currentTime = clock.elapsed;
+          });
+        }
+      });
+      globalTimerStart = !globalTimerStart;
+      return true;
+    }
+    return false;
+  }
+
+  void setGlobalController(AnimationController controller, prevMatched) {
+    _globalController = controller;
+    matched = prevMatched;
+  }
+
+  bool prevControllerStatus(IconData iconData, int id) {
+    if (_globalController.isDismissed) {
+      if (matched) {
+        ref.read(iconStatusProvider.notifier).firstIcon = null;
+        ref.read(iconStatusProvider.notifier).firstId = null;
+      } else {
+        ref.read(iconStatusProvider.notifier).firstIcon = iconData;
+        ref.read(iconStatusProvider.notifier).firstId = id;
       }
-    });
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -88,9 +112,12 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                           inner < iconBox[outer].length;
                           inner++)
                         MatchBoxIcon(
-                            iconData: iconBox[outer][inner],
-                            id: counter++,
-                            firstInteraction: changeInteractionState),
+                          iconData: iconBox[outer][inner],
+                          id: counter++,
+                          firstInteraction: changeInteractionState,
+                          setGlobalController: setGlobalController,
+                          prevControllerStatus: prevControllerStatus,
+                        ),
                   ],
                 ),
               ),

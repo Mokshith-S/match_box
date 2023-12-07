@@ -11,10 +11,15 @@ class MatchBoxIcon extends ConsumerStatefulWidget {
       {super.key,
       required this.iconData,
       required this.id,
-      required this.firstInteraction});
+      required this.firstInteraction,
+      required this.setGlobalController,
+      required this.prevControllerStatus});
   final IconData iconData;
   final int id;
-  final void Function() firstInteraction;
+  final bool Function() firstInteraction;
+  final void Function(AnimationController controller, bool matchValue)
+      setGlobalController;
+  final bool Function(IconData iconData, int id) prevControllerStatus;
 
   @override
   ConsumerState<MatchBoxIcon> createState() => _MatchBoxIconState();
@@ -23,25 +28,14 @@ class MatchBoxIcon extends ConsumerStatefulWidget {
 class _MatchBoxIconState extends ConsumerState<MatchBoxIcon>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
-  // final colorBox = [
-  //   Colors.amber,
-  //   const Color.fromARGB(255, 255, 69, 0),
-  //   const Color.fromARGB(255, 255, 0, 255),
-  //   const Color.fromARGB(255, 0, 128, 128),
-  //   Colors.cyan,
-  //   Colors.green,
-  //   Colors.lime,
-  //   Colors.red,
-  //   const Color.fromARGB(255, 227, 34, 39),
-  // ];
-
+  bool interact = true;
   @override
   void initState() {
     super.initState();
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
-      reverseDuration: const Duration(milliseconds: 400),
+      reverseDuration: const Duration(milliseconds: 200),
     );
   }
 
@@ -55,14 +49,25 @@ class _MatchBoxIconState extends ConsumerState<MatchBoxIcon>
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        widget.firstInteraction();
-        _fadeController.forward();
-        ref
-            .read(iconStatusProvider.notifier)
-            .iconMatchStatus(widget.iconData, widget.id);
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          _fadeController.reverse();
-        });
+        if (interact) {
+          bool matchValue = false;
+          interact = false;
+          final skipFirstClick = widget.firstInteraction();
+          _fadeController.forward();
+
+          if (skipFirstClick ||
+              widget.prevControllerStatus(widget.iconData, widget.id)) {
+            matchValue = ref
+                .read(iconStatusProvider.notifier)
+                .iconMatchStatus(widget.iconData, widget.id);
+          }
+          widget.setGlobalController(_fadeController, matchValue);
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            _fadeController.reverse();
+
+            interact = true;
+          });
+        }
       },
       child: Container(
         decoration: BoxDecoration(
