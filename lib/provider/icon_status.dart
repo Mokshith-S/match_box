@@ -14,17 +14,21 @@ class IconStatusNotifier extends StateNotifier<Map<String, bool>> {
     state = iconMap;
   }
 
-  void iconMatchStatus(IconData icon, int id) {
+  bool iconMatchStatus(IconData icon, int id) {
     if (firstIcon == null) {
       firstIcon = icon;
       firstId = id;
+      return false;
     } else if (firstId != id && firstIcon == icon) {
       state = {...state, icon.toString(): true};
-      firstIcon = icon;
-    } else {
-      firstIcon = icon;
-      firstId = id;
+      firstIcon = null;
+      firstId = null;
+      return true;
     }
+
+    firstIcon = icon;
+    firstId = id;
+    return false;
   }
 
   bool iconCurrentStatus(IconData icon) {
