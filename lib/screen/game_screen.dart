@@ -7,6 +7,7 @@ import 'package:match_box/provider/icon_status.dart';
 import 'package:match_box/widget/icon_holder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:match_box/widget/timer_logic.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final clock = Stopwatch();
 
@@ -62,11 +63,45 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     return true;
   }
 
+  bool compareDuration(String prevRecord) {
+    List<String> timer = prevRecord.split(':');
+    List<String> timerEndValue = timer[2].split('.');
+    final prevTimer = Duration(
+        hours: int.parse(timer[0]),
+        minutes: int.parse(timer[1]),
+        seconds: int.parse(timerEndValue[0]),
+        microseconds: int.parse(timerEndValue[1]));
+    return prevTimer.compareTo(currentTime) > 0;
+  }
+
+  void updateClock() async {
+    final pref = await SharedPreferences.getInstance();
+
+    if (pref.getString(widget.gameMode) == null ||
+        compareDuration(pref.getString(widget.gameMode)!)) {
+      pref.setString(widget.gameMode, currentTime.toString());
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => const AlertDialog(
+              title: Text(
+                'New Record',
+                style: TextStyle(color: Colors.black),
+              ),
+              content: Text('Congratulations, You have a new record')),
+        );
+      }
+    }
+    // pref.setString(widget.gameMode, currentTime.toString());
+    clock.reset();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (ref.read(iconStatusProvider.notifier).timerStoptrigger()) {
       clock.stop();
       measureTime!.cancel();
+      updateClock();
     }
 
     ref.watch(iconStatusProvider);
