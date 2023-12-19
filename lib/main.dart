@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:match_box/logic/matrix.dart';
 import 'package:match_box/provider/icon_status.dart';
 import 'package:match_box/screen/game_screen.dart';
+import 'package:match_box/screen/score_board.dart';
 import 'package:match_box/widget/home_page_animation.dart';
 
 void main() {
@@ -119,6 +120,22 @@ class MatchBoxEntryPage extends ConsumerWidget {
                 onGameStart(context, 'Hard');
               },
               child: const Text('Hard'),
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(100, 35),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => ScoreBoard(),
+                  ),
+                );
+              },
+              child: const Text('Score Board'),
             ),
             const HomeAnimation(),
           ],
